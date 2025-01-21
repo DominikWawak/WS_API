@@ -1,0 +1,17 @@
+name: Main Workflow
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  call-workflow:
+    uses: ./wap_api/.github/workflows/build.yml@main
+  call-workflow-passing-data:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./wap_api/.github/workflows/build.yml@main
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+

@@ -1,7 +1,14 @@
-name: Build a JAR in spring boot using springboot
+name: Sub Workflow Build
+
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+    workflow_call:
+      inputs:
+        config-path:
+          required: true
+          type: string
+      secrets:
+        token:
+          required: true
 
 jobs:
   build:
@@ -16,12 +23,15 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: ‘jetbrains’
-          java-version: '23'
+          java-version: '21'
+
 
 
       - name: Build with Maven
-        run: mvn clean install
-        working-directory: wap_api
+        run: |
+          cd ${{ inputs.working_directory }}
+          mvn clean install
+
 
 
 
@@ -29,10 +39,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/wap_api/target/*.jar'
+          path: '${{ inputs.working_directory }}/target/*.jar'
 
 
       - name: Run Tests
-        run: mvn test
-        working-directory: wap_api
+        run: |
+          cd ${{ inputs.working_directory }}
+          mvn test
 
