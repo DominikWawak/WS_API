@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/weatherStation")
@@ -62,10 +59,22 @@ public class WeatherController {
     }
 
     @GetMapping("/query")
-    public Map<String, Double> querySensorData() {
+    public ResponseEntity<Map<String, Double>> querySensorData(
+            @RequestParam(required = false) List<String> sensorIds,
+            @RequestParam() List<String> metrics,
+            @RequestParam() String statistic,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date start = (startDate != null) ? dateFormat.parse(startDate) : null;
+        Date end = (endDate != null) ? dateFormat.parse(endDate) : null;
 
-        return null;
+        Map<String, Double> response = weatherService.querySensorData(sensorIds, metrics, statistic, start, end);
+
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
 
 
 }
