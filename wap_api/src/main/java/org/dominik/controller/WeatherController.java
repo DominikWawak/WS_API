@@ -62,10 +62,20 @@ public class WeatherController {
     }
 
     @GetMapping("/query")
-    public Map<String, Double> querySensorData() {
+    public Map<String, Double> querySensorData(
+            @RequestParam(required = false) List<String> sensorIds,
+            @RequestParam() List<String> metrics,
+            @RequestParam() String statistic,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date start = (startDate != null) ? dateFormat.parse(startDate) : null;
+        Date end = (endDate != null) ? dateFormat.parse(endDate) : null;
 
-        return null;
+        return weatherService.querySensorData(sensorIds, metrics, statistic, start, end);
     }
+
 
 
 }

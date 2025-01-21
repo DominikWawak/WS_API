@@ -45,6 +45,48 @@ public class WeatherService {
     }
 
     // Design Spec Query
-    //TODO
+    public Map<String, Double> querySensorData(List<String> sensorIds, List<String> metrics, String statistic, Date startDate, Date endDate) {
+        // Filter based on ID and Date
+        List<SensorData> filteredData = sensorData.stream().filter(data -> (sensorIds == null || sensorIds.isEmpty() || sensorIds.contains(data.getId()))).filter(data -> (startDate == null || data.getTimestamp().after(startDate)) && (endDate == null || data.getTimestamp().before(endDate))).toList();
+        // Get the correct metrics
+        Map<String, Double> results = new HashMap<>();
+        for (String metric : metrics) {
+            List<Double> metricValues = filteredData.stream().map(data -> extractMetricValue(data, metric)).filter(Objects::nonNull) // Remove null values
+                    .toList();
+
+            // Get the requested statistic
+            if (!metricValues.isEmpty()) {
+                switch (statistic.toLowerCase()) {
+                    case "min":
+                        results.put(metric, Collections.min(metricValues));
+                        break;
+                    case "max":
+                        results.put(metric, Collections.max(metricValues));
+                        break;
+                    case "sum":
+                        results.put(metric, metricValues.stream().mapToDouble(Double::doubleValue).sum());
+                        break;
+                    case "avg":
+                        results.put(metric, metricValues.stream().mapToDouble(Double::doubleValue).average().orElse(0.0));
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid statistic: " + statistic);
+                }
+            } else {
+                results.put(metric, null);
+            }
+        }
+
+        return results;
+    }
+
+    private Double extractMetricValue(SensorData data, String metric) {
+        return switch (metric.toLowerCase()) {
+            case "temperature" -> (double) data.getTemperature();
+            case "humidity" -> (double) data.getHumidity();
+            case "windspeed" -> (double) data.getWindspeed();
+            default -> null;
+        };
+    }
 
 }
