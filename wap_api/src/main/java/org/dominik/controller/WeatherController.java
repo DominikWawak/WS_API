@@ -19,7 +19,6 @@ public class WeatherController {
     @Autowired
     private WeatherService weatherService;
 
-
     @PostMapping(produces = "application/json", consumes = "application/json")
     public ResponseEntity<SensorData> addSensorData(@RequestBody SensorData sensorData) {
         weatherService.addSensorData(sensorData);
@@ -74,7 +73,5 @@ public class WeatherController {
 
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-
-
 
 }
