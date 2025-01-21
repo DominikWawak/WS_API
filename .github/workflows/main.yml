@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: ./wap_api/.github/workflows/build.yml@main
+    uses: WS_API/wap_api/.github/workflows/build.yml@main
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
