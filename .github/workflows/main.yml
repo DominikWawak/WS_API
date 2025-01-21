@@ -6,7 +6,7 @@ on:
 
 jobs:
   call-workflow:
-    uses: ./wap_api/.github/workflows/build.yml@main
+    uses: WS_API/wap_api/.github/workflows/build.yml@main
   call-workflow-passing-data:
     permissions:
       contents: read
