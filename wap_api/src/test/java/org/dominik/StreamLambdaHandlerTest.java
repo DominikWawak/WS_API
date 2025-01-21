@@ -33,26 +33,92 @@ public class StreamLambdaHandlerTest {
     }
 
     @Test
-    public void ping_streamRequest_respondsWithHello() {
-        InputStream requestStream = new AwsProxyRequestBuilder("/ping", HttpMethod.GET)
-                                            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                                            .buildStream();
+    public void query_weatherStation_returnsCorrectData() throws Exception {
+        InputStream requestStream = new AwsProxyRequestBuilder("/weatherStation/query", HttpMethod.GET)
+                .queryString("sensorIds","ws1,ws2")
+                .queryString("metrics","temperature,humidity")
+                .queryString("statistic","avg")
+                .queryString("startDate","2025-01-14")
+                .queryString("endDate","2025-01-24")
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .buildStream();
+
         ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
 
         handle(requestStream, responseStream);
 
         AwsProxyResponse response = readResponse(responseStream);
         assertNotNull(response);
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatusCode());
+        assertEquals(200, response.getStatusCode());  // Verify that the response status is OK (200)
 
         assertFalse(response.isBase64Encoded());
 
-        assertTrue(response.getBody().contains("pong"));
-        assertTrue(response.getBody().contains("Hello, World!"));
+        assertTrue(response.getBody().contains("temperature"));
+        assertTrue(response.getBody().contains("humidity"));
+
+        assertTrue(response.getBody().contains("\"temperature\":16.0"));
+        assertTrue(response.getBody().contains("\"humidity\":22.0"));
 
         assertTrue(response.getMultiValueHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
         assertTrue(response.getMultiValueHeaders().getFirst(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.APPLICATION_JSON));
+
     }
+
+    @Test
+    public void query_weatherStation_no_start_or_end_date() throws Exception {
+        InputStream requestStream = new AwsProxyRequestBuilder("/weatherStation/query", HttpMethod.GET)
+                .queryString("sensorIds","ws1,ws2")
+                .queryString("metrics","temperature,humidity")
+                .queryString("statistic","avg")
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .buildStream();
+
+        ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
+
+        handle(requestStream, responseStream);
+
+        AwsProxyResponse response = readResponse(responseStream);
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());  // Verify that the response status is OK (200)
+
+        assertFalse(response.isBase64Encoded());
+
+        assertTrue(response.getBody().contains("temperature"));
+        assertTrue(response.getBody().contains("humidity"));
+
+        assertTrue(response.getBody().contains("\"temperature\":16.0"));
+        assertTrue(response.getBody().contains("\"humidity\":22.0"));
+
+        assertTrue(response.getMultiValueHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
+        assertTrue(response.getMultiValueHeaders().getFirst(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.APPLICATION_JSON));
+
+    }
+
+    @Test
+    public void query_weatherStation_missing_query() throws Exception {
+        InputStream requestStream = new AwsProxyRequestBuilder("/weatherStation/query", HttpMethod.GET)
+                .queryString("sensorIds","ws1,ws2")
+                .queryString("statistic","avg")
+                // no metrics
+                .queryString("startDate","2025-01-14")
+                .queryString("endDate","2025-01-24")
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                .buildStream();
+
+        ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
+
+        handle(requestStream, responseStream);
+
+        AwsProxyResponse response = readResponse(responseStream);
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCode());  // Verify that the response status is OK (200)
+
+        assertFalse(response.isBase64Encoded());
+    }
+
+    //TODO add more tests
+
+
 
     @Test
     public void invalidResource_streamRequest_responds404() {
