@@ -4,7 +4,6 @@ import org.dominik.dto.SensorData;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class WeatherService {
@@ -32,7 +31,7 @@ public class WeatherService {
         return Optional.empty();
     }
 
-    public boolean updateSensorData(String id, SensorData sensorData ) {
+    public boolean updateSensorData(String id, SensorData sensorData) {
         return getSensorDataById(id).map(existingCourse -> {
             this.sensorData.remove(existingCourse);
             this.sensorData.add(sensorData);
@@ -45,8 +44,7 @@ public class WeatherService {
         return this.sensorData.removeIf(data -> data.getId().equals(id));
     }
 
-
-
-
+    // Design Spec Query
+    //TODO
 
 }
