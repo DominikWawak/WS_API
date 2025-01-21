@@ -4,6 +4,7 @@ import org.dominik.dto.SensorData;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class WeatherService {
@@ -46,12 +47,18 @@ public class WeatherService {
 
     // Design Spec Query
     public Map<String, Double> querySensorData(List<String> sensorIds, List<String> metrics, String statistic, Date startDate, Date endDate) {
+        List<SensorData> filteredData = sensorData;
         // Filter based on ID and Date
-        List<SensorData> filteredData = sensorData.stream().filter(data -> (sensorIds == null || sensorIds.isEmpty() || sensorIds.contains(data.getId()))).filter(data -> (startDate == null || data.getTimestamp().after(startDate)) && (endDate == null || data.getTimestamp().before(endDate))).toList();
+        if (!sensorIds.isEmpty()) {
+            filteredData = filteredData.stream().filter(data -> sensorIds.contains(data.getId())).collect(Collectors.toList());
+        }
+        if (startDate != null && endDate != null) {
+            filteredData = filteredData.stream().filter(data-> data.getTimestamp().after(startDate) && data.getTimestamp().before(endDate)).collect(Collectors.toList());
+        }
         // Get the correct metrics
         Map<String, Double> results = new HashMap<>();
         for (String metric : metrics) {
-            List<Double> metricValues = filteredData.stream().map(data -> extractMetricValue(data, metric)).filter(Objects::nonNull) // Remove null values
+            List<Double> metricValues = filteredData.stream().map(data -> extractMetricValue(data, metric)).filter(Objects::nonNull)
                     .toList();
 
             // Get the requested statistic
