@@ -1,6 +1,8 @@
 package org.dominik.service;
 
 import org.dominik.dto.SensorData;
+import org.dominik.repository.WeatherRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -9,22 +11,31 @@ import java.util.stream.Collectors;
 @Service
 public class WeatherService {
 
+    private final String TEMPERATURE = "temperature";
+    private final String HUMIDITY = "humidity";
+    private final String WINDSPEED = "windspeed";
 
+    @Autowired
+    private WeatherRepository weatherRepository;
+
+
+
+    @Deprecated
     private final List<SensorData> sensorData = new ArrayList<>();
 
 
     //Basic CRUD
 
     public void addSensorData(SensorData sensorData) {
-        this.sensorData.add(sensorData);
+        this.weatherRepository.save(sensorData);
     }
 
     public List<SensorData> getAllSensorData() {
-        return sensorData;
+        return weatherRepository.findAll();
     }
 
     public Optional<SensorData> getSensorDataById(String id) {
-        for (SensorData data : sensorData) {
+        for (SensorData data : weatherRepository.findAll()) {
             if (data.getId().equals(id)) {
                 return Optional.of(data);
             }
@@ -33,21 +44,22 @@ public class WeatherService {
     }
 
     public boolean updateSensorData(String id, SensorData sensorData) {
-        return getSensorDataById(id).map(existingCourse -> {
-            this.sensorData.remove(existingCourse);
-            this.sensorData.add(sensorData);
+        return getSensorDataById(id).map(existingData -> {
+            this.weatherRepository.delete(existingData);
+            this.weatherRepository.save(existingData);
             return true;
         }).orElse(false);
     }
 
     public boolean deleteSensorData(String id) {
 
-        return this.sensorData.removeIf(data -> data.getId().equals(id));
+        weatherRepository.deleteById(id);
+        return !weatherRepository.existsById(id);
     }
 
     // Design Spec Query
     public Map<String, Double> querySensorData(List<String> sensorIds, List<String> metrics, String statistic, Date startDate, Date endDate) {
-        List<SensorData> filteredData = sensorData;
+        List<SensorData> filteredData = weatherRepository.findAll();
         // Filter based on ID and Date
         if (!sensorIds.isEmpty()) {
             filteredData = filteredData.stream().filter(data -> sensorIds.contains(data.getId())).collect(Collectors.toList());
@@ -89,9 +101,9 @@ public class WeatherService {
 
     private Double extractMetricValue(SensorData data, String metric) {
         return switch (metric.toLowerCase()) {
-            case "temperature" -> (double) data.getTemperature();
-            case "humidity" -> (double) data.getHumidity();
-            case "windspeed" -> (double) data.getWindspeed();
+            case TEMPERATURE -> (double) data.getTemperature();
+            case HUMIDITY -> (double) data.getHumidity();
+            case WINDSPEED -> (double) data.getWindspeed();
             default -> null;
         };
     }
