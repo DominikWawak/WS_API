@@ -38,8 +38,7 @@ public class WeatherController {
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<SensorData> getSensorDataById(@PathVariable String id) {
         Optional<SensorData> sensorData = weatherService.getSensorDataById(id);
-        return sensorData.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return sensorData.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping(value = "/{id}", produces = "application/json", consumes = "application/json")
@@ -60,6 +59,12 @@ public class WeatherController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/query")
+    public Map<String, Double> querySensorData() {
+
+        return null;
     }
 
 
