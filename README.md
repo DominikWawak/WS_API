@@ -13,7 +13,37 @@ Here is a simple architecture diagram:
 
 The full solution is not complete as you can see the way I designed the solution was to have 2 microservices the sensor controller/abstraction layer and the WS_API because not all sensors can post data directly to my API endpoint their data needs to be parsed into the correct format and then posted to the WS_API application.
 
+
+The Project Continous Development was designed and intended to work in the following way:
+
+![Development Diagram](res/dg1.png)
+
+SO far in this project only the first half of the work gets done. The CI runs the command:
+
+```bash
+mvn clean install
+```
+That already runs some simple tests and builds the project.
+
+The second half of the work is not done yet but it would be to deploy the application to AWS Lambda
+by configuring the lambda to take its source code from the AWS S3 bucket.
+
 AWS RDS database was a good choice for this project as it offers structured storing of data and ease of querying the database.
+
+![DB Diagram](res/dg2.png)
+
+
+### Some Future Improvements 🚀:
+* Set up the CI/CD pipeline to deploy the application to AWS Lambda
+* Add more tests to the application
+* Make the sensor controller microservice and pull data form available sensors throught their custom API.
+* Set up an elasicache cluster on AWS for RDS.
+
+
+# REST API Documentation
+
+
+
 # 📁 Collection: CRUD 
 In this section you can see an example of Create, Read, Update and Delete operations on the sensors data. 
 

@@ -111,7 +111,7 @@ public class StreamLambdaHandlerTest {
 
         AwsProxyResponse response = readResponse(responseStream);
         assertNotNull(response);
-        assertEquals(400, response.getStatusCode());  // Verify that the response status is OK (200)
+        assertEquals(400, response.getStatusCode());
 
         assertFalse(response.isBase64Encoded());
     }
