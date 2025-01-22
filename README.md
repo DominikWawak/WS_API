@@ -3,7 +3,7 @@ This is a REST API Documentation for the Weather Station project.
 
 The first part is the basic CRUD operations and the second part is the more interesting query operation.
 
-The application is built with springboot using the aws maven achetype so that it is built to run as an AWS Lambda function.
+The application is built with springboot using the aws maven archetype so that it is built to run as an AWS Lambda function.
 
 The API gateway handles the requests and forwards them to the lambda function.
 
